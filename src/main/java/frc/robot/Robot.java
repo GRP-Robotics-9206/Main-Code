@@ -145,6 +145,16 @@ public class Robot extends TimedRobot {
           feedWheel.set(0); 
           myDrive.tankDrive(-.5, -.5); 
         }
+        else if(timer1.get() < 7.5){ 
+          launchWheel.set(0);
+          feedWheel.set(0);
+          myDrive.tankDrive(.4, -.4); 
+        } else if(timer1.get() < 9.5){ 
+          launchWheel.set(0); 
+          feedWheel.set(0); 
+          myDrive.tankDrive(-.5, -.5); 
+        }
+      }
         else{ //done turning off all motors
           launchWheel.set(0.0); 
           feedWheel.set(0.0); 
