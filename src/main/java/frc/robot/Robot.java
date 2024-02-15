@@ -15,8 +15,12 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 // import com.ctre.phoenix.motorcontrol.ControlMode;
 // import com.ctre.phoenix.motorcontrol.NeutralMode;
 //import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController; 
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.PWMMotorControllerGroup;
+import edu.wpi.first.wpilibj.motorcontrol.Spark; 
 //import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup; 
+//import edu.wpi.first.wpilibj.PWMMotorController; 
+import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController; 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive; 
 import edu.wpi.first.wpilibj.Timer; 
 import edu.wpi.first.wpilibj.XboxController; 
@@ -39,23 +43,48 @@ public class Robot extends TimedRobot {
   private final XboxController driverController = new XboxController(0); 
   private final XboxController operatorController = new XboxController(2);  
 
+  double driveLimit = 1; 
+  double launchPower = 0; 
+  double feedPower = 0; 
   //private Command m_autonomousCommand;
   //private RobotContainer m_robotContainer;
 
 
-  /*  VictorSPX leftFront = new VictorSPX(0);
-  VictorSPX leftRear = new PWMSparkMax(1); 
-  VictorSPX rightFront = new VictorSPX(2); 
-  VictorSPX rightRear = new PWMSparkMax(3); */ 
+  //private final PWMSparkMax leftRear = new PWMSparkMax(1); 
+  private PWMSparkMax leftRear = new PWMSparkMax(1); 
+  private PWMSparkMax leftFront = new PWMSparkMax(2); 
+  private PWMSparkMax rightFront = new PWMSparkMax(3); 
+  private PWMSparkMax rightRear = new PWMSparkMax(4); 
+  //private final PWMSparkMax leftFront = new PWMSparkMax(2); 
+  //private final PWMSparkMax rightFront = new PWMSparkMax(3); 
+  //private final PWMSparkMax rightRear = new PWMSparkMax(4); 
 
-  private final PWMSparkMax leftRear = new PWMSparkMax(1); 
-  private final PWMSparkMax leftFront = new PWMSparkMax(2); 
-  private final PWMSparkMax rightFront = new PWMSparkMax(3); 
-  private final PWMSparkMax rightRear = new PWMSparkMax(4); 
+  PWMMotorControllerGroup.addFollower(leftFront); 
+  PWMMotorControllerGroup.addFollower(rightFront); 
+  PWMMotorControllerGroup.addFollower(leftRear); 
+  PWMMotorControllerGroup.addFollower(rightRear); 
 
-  private final MotorController leftMotors = new MotorController(leftFront, leftRear); 
-  private final MotorController rightMotors = new MotorController(rightFront, rightRear); 
-  private final DifferentialDrive myDrive = new DifferentialDrive(leftMotors, rightMotors); 
+  //private final MotorControllerGroup leftMotors = new MotorControllerGroup(leftFront, leftRear); 
+  //private final MotorControllerGroup rightMotors = new MotorControllerGroup(rightFront, rightRear); 
+  //private final PWMMotorControllerGroup leftMotors = new PWMMotorControllerGroup(leftFront, leftRear); 
+  private final PWMMotorControllerGroup rightRear = new PWMMotorControllerGroup(rightRear); 
+  private final PWMMotorControllerGroup rightFront= new PWMMotorControllerGroup(rightFront); 
+  private final PWMMotorControllerGroup leftFront= new PWMMotorControllerGroup(leftFront); 
+  private final PWMMotorControllerGroup leftRear= new PWMMotorControllerGroup(leftRear); 
+
+
+  //private final DifferentialDrive myDrive = new DifferentialDrive(leftMotors, rightMotors); 
+  private final DifferentialDrive myDrive = new DifferentialDrive(leftFront, leftRear); 
+  private final DifferentialDrive myDrive = new DifferentialDrive(rightFront, rightRear); 
+
+
+
+
+  //leftRear.follow(leftRear); 
+  //leftFront.follow(leftFront); 
+  //rightRear.follow(rightRear); 
+  //rightFront.follow(rightRear);
+
 
   private final PWMSparkMax feedWheel = new PWMSparkMax(5); 
   private final PWMSparkMax launchWheel = new PWMSparkMax(6);
@@ -84,8 +113,12 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
 
-    leftMotors.setInverted(true); 
-    rightMotors.setInverted(false); 
+    //leftMotors.setInverted(true); 
+    leftFront.setInverted(true); 
+    leftRear.setInverted(true); 
+    rightFront.setInverted(false);
+    rightRear.setInverted(false); 
+    //rightMotors.setInverted(false); 
 
     feedWheel.setInverted(true);
     launchWheel.setInverted(true);
@@ -202,14 +235,15 @@ public class Robot extends TimedRobot {
           myDrive.tankDrive(0, 0); 
         }
         // Put default auto code here
-        //myDrive.tankDrive(.3, .3);
-        // leftFront.set(.3); 
-        // leftRear.set(.3); 
-        // rightFront.set(.3); 
-        // rightRear.set(.3);  
-        break;
-    }
-  } 
+        myDrive.tankDrive(.3, .3);
+        //leftFront.set(.3); 
+        //leftRear.set(.3); 
+        //rightFront.set(.3); 
+        //rightRear.set(.3);  
+        break; 
+      }
+    
+
 
   /** This function is called once when teleop is enabled. */
   @Override
@@ -231,8 +265,8 @@ public class Robot extends TimedRobot {
     
     //launcher code here
     if(operatorController.getLeftBumper()) {
-      launchWheel.set(-1); 
-      feedWheel.set(-.2); 
+      launchPower = -1; 
+      feedPower = -.2; 
     }
     else{
       if(operatorController.getAButtonPressed()){
@@ -244,8 +278,8 @@ public class Robot extends TimedRobot {
         feedPower = 0; 
       }
       else if(timer1.get() < 2.0){
-        launchpower = 0; 
-        feedPower = 0; 
+        launchPower = 1; 
+        feedPower = 1; 
     } 
     else{
       launchPower = 0; 
