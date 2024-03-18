@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+//import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser; 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,21 +12,27 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //our added imports are below
 
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax; 
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;  
 // import com.ctre.phoenix.motorcontrol.ControlMode;
 // import com.ctre.phoenix.motorcontrol.NeutralMode;
+//import com.ctre.phoenix.motorcontrol.ControlMode;
+//import com.ctre.phoenix.motorcontrol.NeutralMode;
 //import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMMotorControllerGroup;
-import edu.wpi.first.wpilibj.motorcontrol.Spark; 
+//import com.ctre.phoenix; 
+//import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX; 
+//import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+//import edu.wpi.first.wpilibj.motorcontrol.PWMMotorControllerGroup;
+//import edu.wpi.first.wpilibj.motorcontrol.Spark; 
 //import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup; 
-//import edu.wpi.first.wpilibj.PWMMotorController; 
-import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController; 
+//import edu.wpi.first.wpilibj.PWMMotorController
+//import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController; 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive; 
 import edu.wpi.first.wpilibj.Timer; 
-import edu.wpi.first.wpilibj.XboxController; 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.XboxController;
+//import frc.robot.commands.Climb; 
+//import edu.wpi.first.wpilibj.command.Climb;  
+//import edu.wpi.first.wpilibj2.command.Command;
+//import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 
 /**
@@ -43,55 +50,32 @@ public class Robot extends TimedRobot {
   private final XboxController driverController = new XboxController(0); 
   private final XboxController operatorController = new XboxController(2);  
 
+  //private WPI_VictorSPX hangTopVictor = new WPI_VictorSPX(0); 
+
   double driveLimit = 1; 
   double launchPower = 0; 
   double feedPower = 0; 
+  double hangPower = 1; 
+
+  //double  
   //private Command m_autonomousCommand;
   //private RobotContainer m_robotContainer;
+  
+  private final PWMSparkMax leftRear = new PWMSparkMax(1);
+  private final PWMSparkMax leftFront = new PWMSparkMax(2);
+  private final PWMSparkMax rightRear = new PWMSparkMax(3); 
+  private final PWMSparkMax rightFront = new PWMSparkMax(4); 
 
-
-  //private final PWMSparkMax leftRear = new PWMSparkMax(1); 
-  private PWMSparkMax leftRear = new PWMSparkMax(1); 
-  private PWMSparkMax leftFront = new PWMSparkMax(2); 
-  private PWMSparkMax rightFront = new PWMSparkMax(3); 
-  private PWMSparkMax rightRear = new PWMSparkMax(4); 
-  //private final PWMSparkMax leftFront = new PWMSparkMax(2); 
-  //private final PWMSparkMax rightFront = new PWMSparkMax(3); 
-  //private final PWMSparkMax rightRear = new PWMSparkMax(4); 
-
-  PWMMotorControllerGroup.addFollower(leftFront); 
-  PWMMotorControllerGroup.addFollower(rightFront); 
-  PWMMotorControllerGroup.addFollower(leftRear); 
-  PWMMotorControllerGroup.addFollower(rightRear); 
-
-  //private final MotorControllerGroup leftMotors = new MotorControllerGroup(leftFront, leftRear); 
-  //private final MotorControllerGroup rightMotors = new MotorControllerGroup(rightFront, rightRear); 
-  //private final PWMMotorControllerGroup leftMotors = new PWMMotorControllerGroup(leftFront, leftRear); 
-  private final PWMMotorControllerGroup rightRear = new PWMMotorControllerGroup(rightRear); 
-  private final PWMMotorControllerGroup rightFront= new PWMMotorControllerGroup(rightFront); 
-  private final PWMMotorControllerGroup leftFront= new PWMMotorControllerGroup(leftFront); 
-  private final PWMMotorControllerGroup leftRear= new PWMMotorControllerGroup(leftRear); 
-
-
-  //private final DifferentialDrive myDrive = new DifferentialDrive(leftMotors, rightMotors); 
-  private final DifferentialDrive myDrive = new DifferentialDrive(leftFront, leftRear); 
-  private final DifferentialDrive myDrive = new DifferentialDrive(rightFront, rightRear); 
-
-
-
-
-  //leftRear.follow(leftRear); 
-  //leftFront.follow(leftFront); 
-  //rightRear.follow(rightRear); 
-  //rightFront.follow(rightRear);
-
+  //Motor for hanging mechanism 
+  //private final VictorSPX  = new VictorSPX(0); 
+  //private WPI_VictorSPX hangTopVictor = new WPI_VictorSPX(7); 
 
   private final PWMSparkMax feedWheel = new PWMSparkMax(5); 
   private final PWMSparkMax launchWheel = new PWMSparkMax(6);
 
   private final Timer timer1 = new Timer(); 
 
-  DifferentialDrive drive = new DifferentialDrive(
+  DifferentialDrive myDrive = new DifferentialDrive(
     (double output) -> {
       leftFront.set(output); 
       leftRear.set(output); 
@@ -99,8 +83,8 @@ public class Robot extends TimedRobot {
     (double output) -> {
       rightFront.set(output); 
       rightRear.set(output); 
-    }); 
-
+    }
+  );
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -118,7 +102,11 @@ public class Robot extends TimedRobot {
     leftRear.setInverted(true); 
     rightFront.setInverted(false);
     rightRear.setInverted(false); 
+    //hangTopVictor.setInverted(true); 
     //rightMotors.setInverted(false); 
+
+    //leftRear.follow(leftFront); 
+    //rightRear.follow(rightFront); 
 
     feedWheel.setInverted(true);
     launchWheel.setInverted(true);
@@ -136,6 +124,7 @@ public class Robot extends TimedRobot {
    * <p>This runs after the mode specific periodic functions, but before LiveWindow and
    * SmartDashboard integrated updating.
    */
+
   @Override
   public void robotPeriodic() {}
 
@@ -187,7 +176,6 @@ public class Robot extends TimedRobot {
           feedWheel.set(0); 
           myDrive.tankDrive(-.5, -.5); 
         }
-      }
         else{ //done turning off all motors
           launchWheel.set(0.0); 
           feedWheel.set(0.0); 
@@ -236,11 +224,12 @@ public class Robot extends TimedRobot {
         }
         // Put default auto code here
         myDrive.tankDrive(.3, .3);
-        //leftFront.set(.3); 
-        //leftRear.set(.3); 
-        //rightFront.set(.3); 
-        //rightRear.set(.3);  
+        //leftFront.set(-.3); 
+        //leftRear.set(-.3); 
+        //rightFront.set(-.3); 
+        //rightRear.set(-.3);  
         break; 
+      }
       }
     
 
@@ -259,14 +248,18 @@ public class Robot extends TimedRobot {
     else if(driverController.getLeftBumper()){
       driveLimit = 0.5;  
     }
-    //myDrive.tankDrive(-driverController.getLeftY(), -driverController.getRightY()); 
-    myDrive.arcadeDrive(-driverController.getLeftY()*driveLimit, -driverController.getRightX()*driveLimit);
+    myDrive.tankDrive(-driverController.getLeftY(), -driverController.getRightY()); 
+    //myDrive.arcadeDrive(-driverController.getLeftY()*driveLimit, -driverController.getRightX()*driveLimit);
 
-    
+    //hanging code here
+    if(operatorController.getBButtonPressed() == true){ 
+      hangPower = 0.5; 
+    } 
+  
     //launcher code here
     if(operatorController.getLeftBumper()) {
-      launchPower = -1; 
-      feedPower = -.2; 
+      launchPower = -0.5; 
+      feedPower = -0.5; 
     }
     else{
       if(operatorController.getAButtonPressed()){
@@ -274,12 +267,12 @@ public class Robot extends TimedRobot {
       }
 
       if(timer1.get() < 1.0){ //spool up the launch wheel
-        launchPower = 1; 
+        launchPower = 0.5; 
         feedPower = 0; 
       }
       else if(timer1.get() < 2.0){
-        launchPower = 1; 
-        feedPower = 1; 
+        launchPower = 0.5; 
+        feedPower = 0.5; 
     } 
     else{
       launchPower = 0; 
@@ -290,7 +283,7 @@ public class Robot extends TimedRobot {
     launchWheel.set(launchPower); 
     feedWheel.set(feedPower); 
   }
-}
+
 
   /** This function is called once when the robot is disabled. */
   @Override
@@ -314,5 +307,5 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
-}
+  public void simulationPeriodic() {
+  }}
