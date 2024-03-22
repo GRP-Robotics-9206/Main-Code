@@ -13,17 +13,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //our added imports are below
 
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;  
-// import com.ctre.phoenix.motorcontrol.ControlMode;
-// import com.ctre.phoenix.motorcontrol.NeutralMode;
+//import com.ctre.phoenix.motorcontrol.ControlMode;
+//import com.ctre.phoenix.motorcontrol.NeutralMode;
 //import com.ctre.phoenix.motorcontrol.ControlMode;
 //import com.ctre.phoenix.motorcontrol.NeutralMode;
 //import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMMotorControllerGroup;
-import edu.wpi.first.wpilibj.motorcontrol.Spark; 
+//import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+//import edu.wpi.first.wpilibj.motorcontrol.PWMMotorControllerGroup;
+//import edu.wpi.first.wpilibj.motorcontrol.Spark; 
 //import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup; 
 //import edu.wpi.first.wpilibj.PWMMotorController; 
-import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController; 
+//import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController; 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive; 
 import edu.wpi.first.wpilibj.Timer; 
 import edu.wpi.first.wpilibj.XboxController;
@@ -48,7 +48,9 @@ public class Robot extends TimedRobot {
   private final XboxController driverController = new XboxController(0); 
   private final XboxController operatorController = new XboxController(2);  
 
-  //private WPI_VictorSPX hangTopVictor = new WPI_VictorSPX(0); 
+  //private VictorSPX hangTopVictor = new VictorSPX(0); 
+  //private VictorSPX hangTopVictor = new VictorSPX(Constants.OperatorConstants.hangTopCANID); 
+
 
   double driveLimit = 1; 
   double launchPower = 0; 
@@ -65,7 +67,7 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax rightFront = new PWMSparkMax(4); 
 
   //Motor for hanging mechanism 
-  //private final VictorSPX  = new VictorSPX(0); 
+  //private final VictorSPX hangtopVictor = new VictorSPX(0); 
   //private WPI_VictorSPX hangTopVictor = new WPI_VictorSPX(7); 
 
   private final PWMSparkMax feedWheel = new PWMSparkMax(5); 
@@ -152,15 +154,46 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     switch (m_autoSelected) {
-      case kRedLongAuto: 
-        if(timer1.get() < 3.0) {
-          launchWheel.set(1.0); 
+      case kDefaultAuto:
+      default: //just cross the line backwards for points 
+      //put default auto code here
+        if(timer1.get() < 4.0){
+          myDrive.tankDrive(-.5, -.5); 
+        }
+        else{
+          myDrive.tankDrive(0, 0); 
+        }
+      case kSpeakerMiddle: //start middle speaker launch then backup 
+        if(timer1.get() < 3.0){
+          launchWheel.set(-1.0); 
           feedWheel.set(0.0);
           myDrive.tankDrive(0.0, 0.0); 
         }
         else if(timer1.get() < 5.0){ //turn on feed wheel to launch the note
-          launchWheel.set(1.0); 
-          feedWheel.set(1.0); 
+          launchWheel.set(-1.0); 
+          feedWheel.set(-1.0); 
+          myDrive.tankDrive(0.0, 0.0); 
+        }
+        else if(timer1.get() < 6.5){ //backup over the line for leave points 
+          launchWheel.set(0); 
+          feedWheel.set(0); 
+          myDrive.tankDrive(-.5, -.5); 
+        }
+        else{ //done turning off all motors
+          launchWheel.set(0.0); 
+          feedWheel.set(0.0); 
+          myDrive.tankDrive(0, 0); 
+        }
+      break;
+      case kRedLongAuto: 
+        if(timer1.get() < 3.0) {
+          launchWheel.set(-1.0); 
+          feedWheel.set(0.0);
+          myDrive.tankDrive(0.0, 0.0); 
+        }
+        else if(timer1.get() < 5.0){ //turn on feed wheel to launch the note
+          launchWheel.set(-1.0); 
+          feedWheel.set(-1.0); 
           myDrive.tankDrive(0.0, 0.0); 
         }
         else if(timer1.get() < 6.5){ //backup over the line for leave points 
@@ -182,55 +215,8 @@ public class Robot extends TimedRobot {
           feedWheel.set(0.0); 
           myDrive.tankDrive(0, 0); 
         }
-      case kSpeakerMiddle: //start middle speaker launch then backup 
-        if(timer1.get() < 3.0){
-          launchWheel.set(1.0); 
-          feedWheel.set(0.0);
-          myDrive.tankDrive(0.0, 0.0); 
-        }
-        else if(timer1.get() < 5.0){ //turn on feed wheel to launch the note
-          launchWheel.set(1.0); 
-          feedWheel.set(1.0); 
-          myDrive.tankDrive(0.0, 0.0); 
-        }
-        else if(timer1.get() < 6.5){ //backup over the line for leave points 
-          launchWheel.set(0); 
-          feedWheel.set(0); 
-          myDrive.tankDrive(-.5, -.5); 
-        }
-        else if(timer1.get() < 7.5) { 
-          launchWheel.set(0); 
-          feedWheel.set(0); 
-          myDrive.tankDrive(.4, -.4); 
-        }
-        else if (timer1.get() < 9.5) { 
-         launchWheel.set(0.0); 
-          feedWheel.set(0.0); 
-          myDrive.tankDrive(-.5, -.5);
-        }  
-        else{ //done turning off all motors
-          launchWheel.set(0.0); 
-          feedWheel.set(0.0); 
-          myDrive.tankDrive(0, 0); 
-        }
-      break;
-      case kDefaultAuto:
-      default: //just cross the line backwards for points 
-      //put default auto code here
-        if(timer1.get() < 1.5){
-          myDrive.tankDrive(-.5, -.5); 
-        }
-        else{
-          myDrive.tankDrive(0, 0); 
-        }
-        // Put default auto code here
-        myDrive.tankDrive(.3, .3);
-        //leftFront.set(-.3); 
-        //leftRear.set(-.3); 
-        //rightFront.set(-.3); 
-        //rightRear.set(-.3);  
-        break; 
-      }
+      
+    }
       }
     
 
@@ -246,7 +232,7 @@ public class Robot extends TimedRobot {
     if(driverController.getRightBumper() == true){
       driveLimit = 1; 
     }
-    else if(driverController.getLeftBumper()){
+    else if(driverController.getLeftBumper() == true){
       driveLimit = 0.5;  
     }
     myDrive.tankDrive(-driverController.getLeftY(), -driverController.getRightY()); 
@@ -260,8 +246,8 @@ public class Robot extends TimedRobot {
     //launcher code here
     if(operatorController.getLeftBumper()) {
 
-      launchPower = -0.5; 
-      feedPower = -0.5; 
+      launchPower = -1.0; 
+      feedPower = -1.0; 
 
     }
     else{
@@ -270,12 +256,12 @@ public class Robot extends TimedRobot {
       }
 
       if(timer1.get() < 1.0){ //spool up the launch wheel
-        launchPower = 0.5; 
+        launchPower = 1.0; 
         feedPower = 0; 
       }
       else if(timer1.get() < 2.0){
-        launchPower = 0.5; 
-        feedPower = 0.5; 
+        launchPower = 1.0; 
+        feedPower = 1.0; 
     } 
     else{
       launchPower = 0; 
