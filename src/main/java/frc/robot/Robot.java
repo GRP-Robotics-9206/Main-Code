@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 //import com.ctre.phoenix.motorcontrol.NeutralMode;
 //import com.ctre.phoenix.motorcontrol.ControlMode;
 //import com.ctre.phoenix.motorcontrol.NeutralMode;
-//import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 //import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 //import edu.wpi.first.wpilibj.motorcontrol.PWMMotorControllerGroup;
 //import edu.wpi.first.wpilibj.motorcontrol.Spark; 
@@ -70,10 +70,13 @@ public class Robot extends TimedRobot {
   //private final VictorSPX hangtopVictor = new VictorSPX(0); 
   //private WPI_VictorSPX hangTopVictor = new WPI_VictorSPX(7); 
 
+  //moters for shooting
   private final PWMSparkMax feedWheel = new PWMSparkMax(5); 
   private final PWMSparkMax launchWheel = new PWMSparkMax(6);
 
   private final Timer timer1 = new Timer(); 
+
+  private final Timer timer2 = new Timer(); 
 
   DifferentialDrive myDrive = new DifferentialDrive(
     (double output) -> {
@@ -239,9 +242,20 @@ public class Robot extends TimedRobot {
     //myDrive.arcadeDrive(-driverController.getLeftY()*driveLimit, -driverController.getRightX()*driveLimit);
 
     //hanging code here
-    if(operatorController.getBButtonPressed() == true){ 
-      hangPower = 0.5; 
+    if(operatorController.getBButtonPressed()){ 
+      if(hangPower == 0){
+        timer2.reset();
+      }     
     } 
+    
+    if(timer2.get() < 1.0){
+      hangPower = 0.5;
+    }
+    else{
+      hangPower = 0;
+    }
+   
+    //hangTopVictor.set(hangPower)
   
     //launcher code here
     if(operatorController.getLeftBumper()) {
@@ -273,6 +287,8 @@ public class Robot extends TimedRobot {
     feedWheel.set(feedPower); 
   }
 
+
+  
 
   /** This function is called once when the robot is disabled. */
   @Override
