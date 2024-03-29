@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
   VictorSP leftFront = new VictorSP(8);
   PWMSparkMax rightRear = new PWMSparkMax(3); 
   PWMSparkMax rightFront = new PWMSparkMax(4); 
-  PWMSparkMax hangTopMotor = new PWMSparkMax(0); 
+  PWMSparkMax hangTopMotor = new PWMSparkMax(1); 
 
   //moters for shooting
   PWMSparkMax feedWheel = new PWMSparkMax(5); 
@@ -228,6 +228,19 @@ public class Robot extends TimedRobot {
     //myDrive.arcadeDrive(-driverController.getLeftY()*driveLimit, -driverController.getRightX()*driveLimit);
 
     //hanging code here
+
+    if(driverController.getYButton()){
+      hangPower = 0.25;
+    }
+    
+    else if(driverController.getAButton()){
+      hangPower = -0.25;
+    }
+    
+    else{
+      hangPower = 0;
+    }
+
     /* if(operatorController.getBButtonPressed()){ 
       if(hangPower == 0){
         timer2.reset();
@@ -289,7 +302,8 @@ public class Robot extends TimedRobot {
 
     launchWheel.set(launchPower); 
     feedWheel.set(feedPower); 
-    thirdWheel.set(thirdPower); 
+    thirdWheel.set(thirdPower);
+    hangTopMotor.set(hangPower); 
   }
 
 
