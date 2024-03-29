@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
 
   private final Timer timer1 = new Timer(); 
 
-  private final Timer timer2 = new Timer(); 
+  //private final Timer timer2 = new Timer(); 
 
   //leftFront.set(ControlMode.PercentOutput, left);
   //leftRear.set(ControlMode.PercentOutput, left);
@@ -263,12 +263,12 @@ public class Robot extends TimedRobot {
         timer1.reset(); 
       }
 
-      if(timer1.get() < 2.0){ //spool up the launch wheel
+      if(timer1.get() < 1.0){ //spool up the launch wheel
         launchPower = -1.0;
         thirdPower = -1.0; 
       }
 
-      else if(timer1.get() < 3.0){
+      else if(timer1.get() < 2.0){
         feedPower = -1.0;
         launchPower = -1.0;
         thirdPower = -1.0; 
