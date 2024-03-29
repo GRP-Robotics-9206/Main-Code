@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import java.security.KeyFactory;
+
+import javax.swing.JApplet;
+import javax.xml.namespace.QName;
+
 //import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -148,11 +153,11 @@ public class Robot extends TimedRobot {
         if (timer1.get() < 3.0) {
           launchWheel.set(-1.0);
           feedWheel.set(0.0);
-          thirdWheel.set(0.0); 
+          thirdWheel.set(-1.0); 
           myDrive.tankDrive(0.0, 0.0);
         } else if (timer1.get() < 5.0) { // turn on feed wheel to launch the note
           launchWheel.set(-1.0);
-          feedWheel.set(-1.0);
+          feedWheel.set(-1.0);  
           thirdWheel.set(-1.0);
           myDrive.tankDrive(0.0, 0.0);
         } else if (timer1.get() < 6.5) { // backup over the line for leave points
@@ -171,7 +176,7 @@ public class Robot extends TimedRobot {
         if (timer1.get() < 3.0) {
           launchWheel.set(-1.0);
           feedWheel.set(0.0);
-          thirdWheel.set(0);
+          thirdWheel.set(-1.0);
           myDrive.tankDrive(0.0, 0.0);
         } else if (timer1.get() < 5.0) { // turn on feed wheel to launch the note
           launchWheel.set(-1.0);
